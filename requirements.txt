@@ -1,0 +1,28 @@
+# 核心 AI 推理引擎 (基于 CTranslate2，速度极快)[cite: 10]
+faster-whisper>=1.0.0
+
+# 自动化 FFmpeg 方案 (自动下载和调用自带的 ffmpeg 核心)[cite: 10]
+imageio-ffmpeg>=0.4.9
+
+# 现代化的暗黑风格 GUI 界面库[cite: 10]
+customtkinter>=5.2.2
+
+# 实现“拖拽视频到窗口”功能的必备扩展库[cite: 10]
+tkinterdnd2>=0.3.1
+
+# 数据处理基础库 (被其它库依赖，显式写出更稳妥)[cite: 10]
+numpy>=1.24.0
+
+# =====================================================================
+# 以下为需要特殊指定硬件加速（CUDA 12.1）的库
+# 强烈建议不要直接使用普通的 pip install 命令安装，以防下载纯 CPU 阉割版
+# 请在部署新环境时，复制下方注释中的专用命令单独安装，确保激活显卡加速：
+# =====================================================================
+
+# PyTorch (带 CUDA 12.1 加速)[cite: 10]
+# 安装命令: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+torch
+
+# 本地 LLM 翻译引擎大脑 (带 CUDA 12.1 加速的预编译包)
+# 安装命令: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121 --only-binary llama-cpp-python
+llama-cpp-python
