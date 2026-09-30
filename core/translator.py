@@ -5,6 +5,21 @@ from llama_cpp import Llama
 
 
 class TranslatorEngine:
+    # 内部维护的代号映射表，专用于将 UI/Whisper 传来的代号转为 LLM 最容易理解的标准英文名
+    LANG_CODE_TO_NAME = {
+        "zh": "Simplified Chinese",
+        "zh-tw": "Traditional Chinese",
+        "en": "English",
+        "ja": "Japanese",
+        "ko": "Korean",
+        "de": "German",
+        "fr": "French",
+        "es": "Spanish",
+        "ru": "Russian",
+        "ar": "Arabic",
+        "uk": "Ukrainian"
+    }
+
     def __init__(self, model_path=None, context_size=2):
         """
         初始化大语言模型翻译引擎。
@@ -18,45 +33,120 @@ class TranslatorEngine:
         print(f"[*] 正在唤醒本地大语言模型 (路径: {model_path})...")
 
         try:
-            # 初始化 Llama 模型
             self.llm = Llama(
                 model_path=model_path,
-                n_gpu_layers=-1,  # 核心参数！-1 表示将所有计算层卸载到 4070 Ti 显存中，实现极速推理
-                n_ctx=2048,  # 将上下文窗口拉高到 2048，防止长句溢出崩溃
-                verbose=False  # 关闭底层的 C++ 刷屏日志，保持控制台清爽
+                n_gpu_layers=-1,
+                n_ctx=2048,
+                verbose=False
             )
             self.context_size = context_size
             print("[*] 翻译大脑启动完毕，显存接力成功！")
         except Exception as e:
             raise RuntimeError(f"翻译模型加载失败，请检查 GGUF 文件路径是否正确: {str(e)}")
 
-    def _build_messages(self, prev_context, target_text, next_context, target_lang):
+    def _build_messages(self, prev_context, target_text, next_context, target_code, source_code):
         """
-        构建包含 Few-Shot 示范的 ChatML 格式 Prompt。
-        使用动态示例映射，防止模型被固定的中文示例带偏。
+        构建基于“源语言专家路由”的 ChatML 格式 Prompt。
+        完全基于 ISO 语言代号进行精确路由，抛弃了容易出错的字符串模糊匹配。
         """
-        # 动态生成对应语言的示例译文
-        example_map = {
-            "简体中文": "一个苹果！",
-            "繁体中文": "一個蘋果！",
-            "德语": "Ein Apfel!",
-            "西班牙语": "¡Una manzana!",
-            "阿拉伯语": "تفاحة!",
-            "乌克兰语": "Яблуко!",
-            "法语": "Une pomme !",
-            "日语": "りんご！",
-            "韩语": "사과!",
-            "俄语": "Яблоко!"
-        }
-        # 如果遇到字典里没有的语言，就使用占位符暗示 AI
-        example_translation = example_map.get(target_lang, f"<Translate 'An apple!' to {target_lang}>")
+        # 确保传入的代号是规范的小写
+        target_code = target_code.lower().strip()
+        source_code = source_code.lower().strip() if source_code else "auto"
 
-        system_prompt = f"""You are a professional subtitle translator. Translate the [TARGET SENTENCE] into {target_lang} using the provided context.
+        # 转换为大模型最易理解的英文名称 (如果遇到不在字典里的小语种，就直接使用其代号作为兜底)
+        target_name = self.LANG_CODE_TO_NAME.get(target_code, target_code)
+        source_name = self.LANG_CODE_TO_NAME.get(source_code, source_code)
+
+        # ==========================================
+        # 语言专家路由分支 (Expert Routing) - 纯代号匹配
+        # ==========================================
+        if source_code == "uk":
+            # 乌克兰语专属：严防西里尔字母回流，处理错词
+            system_prompt = f"""You are a professional subtitle translator. Translate this [{source_name}] subtitle into fluent [{target_name}].
 Strictly adhere to the following rules:
-1. Do NOT translate the [PREVIOUS CONTEXT] or [NEXT CONTEXT].
-2. The target sentence might be a fragment. Preserve its fragmented state. Do NOT artificially add subjects or complete the sentence.
-3. Do NOT output any explanations, conversational filler, or extra text.
-4. You MUST output ONLY valid JSON format.
+1. TARGET LANGUAGE LOCK: The output MUST be strictly in [{target_name}]. NEVER output Cyrillic or original [{source_name}] text in the translation.
+2. FLUENCY & CORRECTION: Intelligently fix misheard words in the source based on context, then translate naturally.
+3. CONTEXT RULES: Use [PREVIOUS CONTEXT] and [NEXT CONTEXT] only to understand the flow. DO NOT translate the context lines.
+4. PURE OUTPUT: Do NOT output any explanations or extra text.
+5. STRICT JSON: You MUST output ONLY a valid JSON object containing a single key "translation".
+
+[EXAMPLE]
+[PREVIOUS CONTEXT]:
+N-1: Світла немає.
+[TARGET SENTENCE]:
+N: Тож, е-е, я думаю, нам варто піти на...
+[NEXT CONTEXT]:
+N+1: прогулянку.
+[{target_name} Translation]:
+{{"translation": "<Translate 'So I think we should go for a...' into {target_name}, omitting filler 'е-е'>"}}
+"""
+
+        elif source_code == "es":
+            # 西班牙语专属：彻底放开意译，重点删除口语废话
+            system_prompt = f"""You are a professional subtitle translator. Translate this [{source_name}] subtitle into fluent [{target_name}].
+Strictly adhere to the following rules:
+1. FLUENCY OVER LITERAL: Prioritize natural, idiomatic phrasing in [{target_name}]. Do NOT use rigid word-for-word translation.
+2. OMIT FILLERS: Strictly remove meaningless conversational fillers (e.g., eh, bueno, pues, o sea, básicamente).
+3. CONTEXT RULES: Use [PREVIOUS CONTEXT] and [NEXT CONTEXT] only to understand the flow. DO NOT translate the context lines.
+4. PURE OUTPUT: Do NOT output any explanations or extra text.
+5. STRICT JSON: You MUST output ONLY a valid JSON object containing a single key "translation".
+
+[EXAMPLE]
+[PREVIOUS CONTEXT]:
+N-1: El clima es agradable.
+[TARGET SENTENCE]:
+N: O sea, bueno, creo que deberíamos ir a dar un paseo.
+[NEXT CONTEXT]:
+N+1: Al parque.
+[{target_name} Translation]:
+{{"translation": "<Translate 'I think we should go for a walk.' into {target_name}, omitting 'O sea, bueno'>"}}
+"""
+
+        elif source_code == "en":
+            # 英语专属：技术语境同音词纠错，口水话过滤
+            system_prompt = f"""You are a professional subtitle translator. Translate this [{source_name}] subtitle into fluent [{target_name}].
+Strictly adhere to the following rules:
+1. CONTEXTUAL CORRECTION: The source is generated by speech recognition. Fix obvious homophone errors based on tech/general context (e.g., "pause" -> "Pods", "wok" -> "walk") before translating.
+2. OMIT FILLERS: Strictly remove conversational fillers (e.g., um, uh, basically, literally, you know).
+3. CONTEXT RULES: Use [PREVIOUS CONTEXT] and [NEXT CONTEXT] only to understand the flow. DO NOT translate the context lines.
+4. PURE OUTPUT: Do NOT output any explanations or extra text.
+5. STRICT JSON: You MUST output ONLY a valid JSON object containing a single key "translation".
+
+[EXAMPLE]
+[PREVIOUS CONTEXT]:
+N-1: The game is running on the front end.
+[TARGET SENTENCE]:
+N: So basically, um, we also have another microservice running on pause.
+[NEXT CONTEXT]:
+N+1: Let's go through the kubernetes config.
+[{target_name} Translation]:
+{{"translation": "<Translate 'We also have another microservice running on Pods.' into {target_name}>"}}
+"""
+
+        else:
+            # 通用兜底分支 (Generic Fallback)
+            # 这里的键也全面替换为标准 ISO 代号
+            example_map = {
+                "zh": "一个苹果！",
+                "zh-tw": "一個蘋果！",
+                "de": "Ein Apfel!",
+                "es": "¡Una manzana!",
+                "ar": "تفاحة!",
+                "uk": "Яблуко!",
+                "fr": "Une pomme !",
+                "ja": "りんご！",
+                "ko": "사과!",
+                "ru": "Яблоко!"
+            }
+            example_translation = example_map.get(target_code, f"<Translate 'An apple!' to {target_name}>")
+
+            system_prompt = f"""You are a professional subtitle translator. Translate this [{source_name}] subtitle into fluent, natural [{target_name}] using the provided context.
+Strictly adhere to the following rules:
+1. FLUENCY OVER LITERAL: Prioritize natural phrasing and idiomatic expressions in [{target_name}] over literal word-for-word translation. The output MUST be strictly in [{target_name}].
+2. CONTEXT RULES: Use [PREVIOUS CONTEXT] and [NEXT CONTEXT] only to understand the flow. DO NOT translate the context lines.
+3. CONTEXTUAL CORRECTION: Intelligently fix obvious homophone errors or misheard words based on the context before translating.
+4. PURE OUTPUT: Do NOT output any explanations, notes, or ANY extra text.
+5. STRICT JSON: You MUST output ONLY a valid JSON object containing a single key "translation".
 
 [EXAMPLE]
 [PREVIOUS CONTEXT]:
@@ -65,27 +155,31 @@ N-1: Look at this!
 N: An apple!
 [NEXT CONTEXT]:
 N+1: So big.
-[OUTPUT]:
+[{target_name} Translation]:
 {{"translation": "{example_translation}"}}
 """
 
+        # ==========================================
+        # 拼接 User Prompt
+        # ==========================================
         user_prompt = "[PREVIOUS CONTEXT]:\n"
         user_prompt += "\n".join(prev_context) if prev_context else "None"
         user_prompt += "\n\n[TARGET SENTENCE]:\n" + target_text
         user_prompt += "\n\n[NEXT CONTEXT]:\n"
         user_prompt += "\n".join(next_context) if next_context else "None"
-        user_prompt += "\n\n[OUTPUT]:"
+        user_prompt += f"\n\n[{target_name} Translation]:"
 
         return [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ]
 
-    def translate_segments(self, segments, target_lang="简体中文", context_size=None):
+    def translate_segments(self, segments, target_lang="zh", source_lang="auto", context_size=None):
         """
         执行滑动窗口批量翻译 (Generator 模式)
         :param segments: Whisper 生成的字典列表 [{'start': 0, 'end': 2, 'text': '...'}]
-        :param target_lang: 目标语言
+        :param target_lang: 目标语言（接收纯代号，如 "zh"）
+        :param source_lang: 视频源语言（接收纯代号，如 "es", "uk"）
         :param context_size: 允许 UI 传入新值覆盖默认的上下文大小
         :yield: 注入了 'translated' 字段的完整字典
         """
@@ -93,10 +187,9 @@ N+1: So big.
             context_size = self.context_size
 
         total = len(segments)
-        print(f"[*] 开始执行滑动窗口翻译，共 {total} 句，上下文范围: ±{context_size}")
+        print(f"[*] 开始执行滑动窗口翻译 (源语言代号: {source_lang} -> 目标语言代号: {target_lang})，共 {total} 句...")
 
         for i, segment in enumerate(segments):
-            # 1. 提取滑动窗口的上下文句子
             start_idx = max(0, i - context_size)
             end_idx = min(total, i + context_size + 1)
 
@@ -104,10 +197,9 @@ N+1: So big.
             next_context = [f"N+{j - i}: {segments[j]['text']}" for j in range(i + 1, end_idx)]
             target_text = f"N: {segment['text']}"
 
-            # 2. 构建对话结构
-            messages = self._build_messages(prev_context, target_text, next_context, target_lang)
+            # 核心：此时传递给 prompt 构建器的是纯净的代号
+            messages = self._build_messages(prev_context, target_text, next_context, target_lang, source_lang)
 
-            # 3. 呼叫模型，开启 JSON 强制约束
             try:
                 response = self.llm.create_chat_completion(
                     messages=messages,
@@ -119,18 +211,16 @@ N+1: So big.
                             "required": ["translation"],
                         }
                     },
-                    temperature=0.1,  # 极低的温度，杜绝 AI 发散思维，要求极其确定性的输出
+                    temperature=0.2,
                 )
 
-                # 提取并解析 JSON
                 raw_output = response["choices"][0]["message"]["content"]
                 translated_text = json.loads(raw_output).get("translation", segment['text'])
 
             except Exception as e:
                 print(f"[!] 警告：第 {i + 1} 句翻译失败或 JSON 解析异常: {e} | 已自动回退为原文")
-                translated_text = segment['text']  # 极端的容错机制：宁可保留原文，也不能让程序崩溃
+                translated_text = segment['text']
 
-            # 4. 数据合并与状态回传
             segment['translated'] = translated_text
             progress_percent = min(100.0, ((i + 1) / total) * 100)
 
