@@ -8,6 +8,7 @@ class OptionGroup(QWidget):
     """
     白蓝极简风复合选项组 (Option Group)
     极致纯净版：支持横向、纵向以及网格(Grid)排版，完美修复 Qt 圆形边框变形与残影 Bug。
+    新增特性：支持动态启用/禁用(置灰)单个特定选项。
     """
     # 选项改变时发射信号，传递当前选中的索引列表
     selection_changed = Signal(list)
@@ -20,7 +21,7 @@ class OptionGroup(QWidget):
         self.default_checked = default_checked if default_checked else []
         self.is_single_choice = is_single_choice
         self.orientation = orientation
-        self.grid_columns = grid_columns  # 新增：网格列数 (0表示不使用网格)
+        self.grid_columns = grid_columns  # 网格列数 (0表示不使用网格)
 
         self.buttons = []
         # 用于单选模式的互斥管理
@@ -94,6 +95,9 @@ class OptionGroup(QWidget):
                 font-size: 14px;
                 spacing: 8px; /* 框与文字的间距 */
             }
+            QCheckBox:disabled, QRadioButton:disabled {
+                color: #A0A0A0; /* 禁用状态时，文字变灰 */
+            }
         """
 
         # 多选框样式 (无勾号，纯净蓝方块)
@@ -112,6 +116,10 @@ class OptionGroup(QWidget):
             QCheckBox::indicator:checked {
                 background-color: #0078D7;
                 border: 1px solid #0078D7;
+            }
+            QCheckBox::indicator:disabled {
+                border: 1px solid rgba(0, 0, 0, 30);
+                background-color: rgba(240, 240, 240, 150);
             }
         """
 
@@ -139,6 +147,10 @@ class OptionGroup(QWidget):
                 /* 修复悬停时的边框抖动 */
                 border: 4px solid #005A9E; 
             }
+            QRadioButton::indicator:disabled {
+                border: 1px solid rgba(0, 0, 0, 30);
+                background-color: rgba(240, 240, 240, 150);
+            }
         """
 
         self.setStyleSheet(base_style + checkbox_style + radio_style)
@@ -164,3 +176,28 @@ class OptionGroup(QWidget):
             if btn.isChecked():
                 selected.append(btn.text())
         return selected
+
+    def set_item_enabled(self, index: int, enabled: bool):
+        """
+        动态启用/禁用单个选项
+        :param index: 选项的序号 (从0开始)
+        :param enabled: True为启用，False为置灰禁用
+        """
+        if 0 <= index < len(self.buttons):
+            btn = self.buttons[index]
+
+            # 如果当前准备置灰，并且该选项正好处于勾选状态，则强制取消勾选
+            if not enabled and btn.isChecked():
+                btn.blockSignals(True)  # 防止触发冗余信号
+                btn.setChecked(False)
+                btn.blockSignals(False)
+                # 状态改变，主动向外发射一次信号
+                self.selection_changed.emit(self.get_selected_indices())
+
+            btn.setEnabled(enabled)
+
+            # 切换鼠标指针：禁用时变为普通箭头，启用时变回小手
+            if enabled:
+                btn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+            else:
+                btn.setCursor(QCursor(Qt.CursorShape.ArrowCursor))

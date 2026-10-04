@@ -34,9 +34,10 @@ class MainWindowNew(QMainWindow):
         super().__init__()
         # 继承原有的基础窗口设置[cite: 14]
         self.setWindowTitle(self.tr("CaptionGen Translator - 专业离线AI字幕引擎 (全新极简版)"))
-        self.resize(1000, 800)
+        self.resize(1000, 700)
         self.setMinimumSize(950, 700)
-
+        # 2. 调用居中！
+        self.center_window()
         # 建立中央画布和主水平布局 (左右分栏)[cite: 14]
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -105,3 +106,17 @@ class MainWindowNew(QMainWindow):
         self.stacked_widget.addWidget(self.settings_page)
 
         self.main_layout.addWidget(self.stacked_widget, stretch=1)
+
+    def center_window(self):
+        """将窗口移动到屏幕正中央"""
+        # 获取当前屏幕的可用几何区域（自动扣除底部的 Windows 任务栏）
+        screen_geometry = self.screen().availableGeometry()
+
+        # 获取我们自己窗口的几何数据
+        window_geometry = self.frameGeometry()
+
+        # 把窗口的中心点，对齐到屏幕的中心点
+        window_geometry.moveCenter(screen_geometry.center())
+
+        # 真正移动窗口到计算好的左上角位置
+        self.move(window_geometry.topLeft())

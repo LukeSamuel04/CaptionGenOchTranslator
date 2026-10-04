@@ -67,6 +67,15 @@ class LabeledComboBox(QWidget):
                 border-left: none; /* 去除原生分割线 */
             }
 
+            /* ==========================================
+               核心修复：使用本地相对路径引入真实的箭头图片 
+               ========================================== */
+            QComboBox::down-arrow {
+                width: 14px;
+                height: 14px;
+                image: url("assets/icons/black_arrow_for_combobox.png");
+            }
+
             /* 2. 弹出的下拉菜单层 (QListView) */
             QComboBox QAbstractItemView {
                 background-color: #FFFFFF;

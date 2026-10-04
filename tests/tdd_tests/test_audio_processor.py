@@ -58,7 +58,7 @@ class TestAudioProcessor(unittest.TestCase):
     # 【真实的物理文件集成测试】
     # 默认是跳过的。你要测试真实的视频，请把下方 @unittest.skip 这一行注释掉！
     # =====================================================================
-    # @unittest.skip("跳过真实的视频测试。要测试的话，请注释掉此行代码。")
+    @unittest.skip("跳过真实的视频测试。要测试的话，请注释掉此行代码。")
     def test_real_video_extraction(self):
         """测试用例 4：真实环境测试，读取你的视频并生成真实音频"""
 
