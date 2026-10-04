@@ -149,9 +149,8 @@ class ConfigPanel(QWidget):
         selected_langs = []
         for display_name, lang_code in self.SUPPORTED_LANGS.items():
             if self.lang_checkboxes[lang_code].isChecked():
-                # 我们同时把“显示名”和“内部代号”传给后台
-                # 这样后台既能用显示名作为 prompt 喂给 ALMA，又能用代号命名文件
-                selected_langs.append({"code": lang_code, "name": display_name})
+                # 重构核心：废弃混合字典映射，全栈统一仅向后端传递纯净的 ISO 语言代号
+                selected_langs.append(lang_code)
 
         selected_formats = []
         if self.chk_srt.isChecked(): selected_formats.append("srt")
@@ -165,7 +164,7 @@ class ConfigPanel(QWidget):
         return {
             "media_path": self.file_path_edit.text().strip(),
             "output_dir": self.out_dir_edit.text().strip(),
-            "target_langs": selected_langs,
+            "target_langs": selected_langs,  # 现在的格式是清晰的 ["zh", "es", "uk"]
             "file_formats": selected_formats,
             "export_modes": selected_modes
         }

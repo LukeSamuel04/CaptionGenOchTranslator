@@ -17,11 +17,9 @@ class TestWhisperEngine(unittest.TestCase):
         """
         在所有测试用例开始前执行一次。
         在这里初始化引擎，确保大模型只被加载一次。
-        对于测试来说，为了速度，我们强制使用一个极小的模型 (tiny)。
         """
-        print("\n[测试准备] 正在加载极小体积的 Whisper Tiny 模型用于快速测试...")
-        # 注意：这里传入 "tiny" 仅仅是为了测试跑得快。真实软件里默认是 "large-v3"
-        cls.engine = WhisperEngine(model_size="large-v3")
+        print("\n[测试准备] ...")
+        cls.engine = WhisperEngine()
         print("[测试准备] 引擎初始化完成。")
 
     def test_engine_initialization(self):
@@ -34,7 +32,7 @@ class TestWhisperEngine(unittest.TestCase):
     # 【真实的物理音频集成测试】
     # 默认跳过。你要测试真实的音频，请把下方 @unittest.skip 这一行注释掉！
     # =====================================================================
-    # @unittest.skip("跳过真实的音频识别测试。要测试的话，请注释掉此行代码。")
+    @unittest.skip("跳过真实的音频识别测试。要测试的话，请注释掉此行代码。")
     def test_real_audio_transcription(self):
         """测试用例：真实环境测试，读取你准备好的 .wav 音频并识别"""
 

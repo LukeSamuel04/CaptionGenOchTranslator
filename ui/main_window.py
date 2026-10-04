@@ -1,7 +1,8 @@
 import os
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QPushButton, QMessageBox
+from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+                               QPushButton, QMessageBox, QStackedWidget, QListWidget, QLabel)
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtGui import QDesktopServices, QFont
 
 # 导入前端组件
 from ui.components.config_panel import ConfigPanel
@@ -17,31 +18,100 @@ class MainWindow(QMainWindow):
 
         # 配置窗口基础属性
         self.setWindowTitle(self.tr("CaptionGen Translator - 专业离线AI字幕引擎"))
-        self.resize(900, 800)
-        self.setMinimumSize(850, 700)
+        self.resize(1000, 800)
+        self.setMinimumSize(950, 700)
 
-        # 建立中央画布和主垂直布局
+        # 建立中央画布和主水平布局 (左右分栏)
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        self.main_layout = QVBoxLayout(self.central_widget)
-
-        self.main_layout.setContentsMargins(20, 20, 20, 20)
-        self.main_layout.setSpacing(15)
+        self.main_layout = QHBoxLayout(self.central_widget)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
 
         # ---------------------------------------------------------
-        # 1. 挂载组件
+        # 1. 搭建左侧导航栏 (Sidebar)
         # ---------------------------------------------------------
+        self.sidebar = QListWidget()
+        self.sidebar.setFixedWidth(200)
+        self.sidebar.setFocusPolicy(Qt.FocusPolicy.NoFocus)  # 去除点击时的虚线框
+        # 简单的现代化 QListWidget 样式
+        self.sidebar.setStyleSheet("""
+            QListWidget {
+                background-color: #2b2b2b;
+                color: #dcdcdc;
+                border: none;
+                padding-top: 20px;
+                font-size: 15px;
+            }
+            QListWidget::item {
+                height: 50px;
+                padding-left: 20px;
+            }
+            QListWidget::item:selected {
+                background-color: #0078D7;
+                color: white;
+                font-weight: bold;
+                border-left: 4px solid #00A2FF;
+            }
+            QListWidget::item:hover:!selected {
+                background-color: #3f3f3f;
+            }
+        """)
+
+        # 添加导航项目
+        self.sidebar.addItem(self.tr("工作台"))
+        self.sidebar.addItem(self.tr("组件下载"))
+        self.sidebar.addItem(self.tr("系统设置"))
+
+        self.main_layout.addWidget(self.sidebar)
+
+        # ---------------------------------------------------------
+        # 2. 搭建右侧多页面栈 (Stacked Widget)
+        # ---------------------------------------------------------
+        self.stacked_widget = QStackedWidget()
+        # 右侧内容区加一点边距
+        self.stacked_widget.setContentsMargins(20, 20, 20, 20)
+
+        # 构建并添加三个页面
+        self.workspace_page = self._build_workspace_page()
+        self.model_center_page = self._build_model_center_page()
+        self.settings_page = self._build_settings_page()
+
+        self.stacked_widget.addWidget(self.workspace_page)
+        self.stacked_widget.addWidget(self.model_center_page)
+        self.stacked_widget.addWidget(self.settings_page)
+
+        self.main_layout.addWidget(self.stacked_widget, stretch=1)
+
+        # ---------------------------------------------------------
+        # 3. 信号与交互绑定
+        # ---------------------------------------------------------
+        # 绑定侧边栏点击事件 -> 切换右侧 StackedWidget 的页面
+        self.sidebar.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
+
+        # 默认选中第一页
+        self.sidebar.setCurrentRow(0)
+
+        # 预留 worker 实例变量
+        self.worker = None
+
+    def _build_workspace_page(self):
+        """构建第一页：核心翻译工作台 (无损迁移你之前的原有代码)"""
+        page = QWidget()
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(15)
+
+        # 挂载原有组件
         self.config_panel = ConfigPanel(self)
-        self.main_layout.addWidget(self.config_panel)
+        layout.addWidget(self.config_panel)
 
         self.log_panel = LogPanel(self)
-        self.main_layout.addWidget(self.log_panel)
+        layout.addWidget(self.log_panel)
 
-        self.main_layout.addStretch()
+        layout.addStretch()
 
-        # ---------------------------------------------------------
-        # 2. 全局控制区
-        # ---------------------------------------------------------
+        # 原有的全局控制区
         self.start_btn = QPushButton(self.tr("开始生成 (Start Generation)"))
         self.start_btn.setMinimumHeight(45)
         self.start_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -61,14 +131,48 @@ class MainWindow(QMainWindow):
                 color: #AAAAAA;
             }
         """)
-        self.main_layout.addWidget(self.start_btn)
+        layout.addWidget(self.start_btn)
 
-        # 绑定点击事件
+        # 绑定核心运行事件
         self.start_btn.clicked.connect(self._on_start_clicked)
 
-        # 预留 worker 实例变量
-        self.worker = None
+        return page
 
+    def _build_model_center_page(self):
+        """构建第二页：模型下载中心 (预留开发占位)"""
+        page = QWidget()
+        layout = QVBoxLayout(page)
+
+        # 临时占位提示，等你写 DownloadWorker 时替换
+        placeholder_label = QLabel(self.tr("模型下载中心\n\n(正在开发中...即将加入断点续传与多源镜像测速)"))
+        placeholder_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        font = QFont()
+        font.setPointSize(20)
+        placeholder_label.setFont(font)
+        placeholder_label.setStyleSheet("color: #777777;")
+
+        layout.addWidget(placeholder_label)
+        return page
+
+    def _build_settings_page(self):
+        """构建第三页：全局设置 (预留开发占位)"""
+        page = QWidget()
+        layout = QVBoxLayout(page)
+
+        # 临时占位提示
+        placeholder_label = QLabel(self.tr("全局系统设置\n\n(正在开发中...即将加入本地化保存功能)"))
+        placeholder_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        font = QFont()
+        font.setPointSize(20)
+        placeholder_label.setFont(font)
+        placeholder_label.setStyleSheet("color: #777777;")
+
+        layout.addWidget(placeholder_label)
+        return page
+
+    # ==================================================================
+    # 核心任务调度逻辑 (完全保留，未做任何更改)
+    # ==================================================================
     def _on_start_clicked(self):
         """点击开始按钮的统筹逻辑"""
         # 1. 校验前端参数
