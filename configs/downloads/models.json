@@ -1,0 +1,64 @@
+{
+  "models": [
+    {
+      "model_id": "whisper-large-v3",
+      "display_name": "Whisper Large-V3 (极速听写引擎)",
+      "description": "最高精度的开源语音识别模型，由 Systran 提供的 Faster-Whisper 版本。推荐显存 8GB 以上使用。",
+      "type": "audio-to-text",
+      "install_dir": "assets/models/whisper-large-v3",
+      "files": [
+        {
+          "file_name": "model.bin",
+          "url_global": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/main/model.bin",
+          "url_cn": "https://hf-mirror.com/Systran/faster-whisper-large-v3/resolve/main/model.bin",
+          "size_bytes": 3087284237,
+          "sha256": "69f74147e3334731bc3a76048724833325d2ec74642fb52620eda87352e3d4f1"
+        },
+        {
+          "file_name": "config.json",
+          "url_global": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/main/config.json",
+          "url_cn": "https://hf-mirror.com/Systran/faster-whisper-large-v3/resolve/main/config.json",
+          "size_bytes": 2394,
+          "sha256": "a9306624f5ec14270a014b647e5c316b6e03a662c369758d1b90697a7b0655b9"
+        },
+        {
+          "file_name": "preprocessor_config.json",
+          "url_global": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/main/preprocessor_config.json",
+          "url_cn": "https://hf-mirror.com/Systran/faster-whisper-large-v3/resolve/main/preprocessor_config.json",
+          "size_bytes": 340,
+          "sha256": "7ccc62c6f2765af1f3b46c00c9b5894426835a05021c8b9c01eecb6dfb542711"
+        },
+        {
+          "file_name": "tokenizer.json",
+          "url_global": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/main/tokenizer.json",
+          "url_cn": "https://hf-mirror.com/Systran/faster-whisper-large-v3/resolve/main/tokenizer.json",
+          "size_bytes": 2480617,
+          "sha256": "6d8cbd7cd0d8d5815e478dac67b85a26bbe77c1f5e0c6d76d1ce2abc0e5f21ca"
+        },
+        {
+          "file_name": "vocabulary.json",
+          "url_global": "https://huggingface.co/Systran/faster-whisper-large-v3/resolve/main/vocabulary.json",
+          "url_cn": "https://hf-mirror.com/Systran/faster-whisper-large-v3/resolve/main/vocabulary.json",
+          "size_bytes": 1068114,
+          "sha256": "c69260f2ab26d659b7c398f9a2b2b48ed0df16c3b47d7326782fd9cba71690c1"
+        }
+      ]
+    },
+    {
+      "model_id": "llama-3.1-8b",
+      "display_name": "LLaMA-3.1-8B-Instruct (智能翻译引擎)",
+      "description": "Meta 开源的最新 8B 大语言模型，Q4_K_M 量化版，占用极低显存且翻译逻辑精准，支持多语种。",
+      "type": "translation",
+      "install_dir": "assets/models/llama-3.1-8b",
+      "files": [
+        {
+          "file_name": "llama-3.1-8b.gguf",
+          "url_global": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+          "url_cn": "https://hf-mirror.com/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+          "size_bytes": 4920738944,
+          "sha256": "667b0c1932bc6ffc593ed1d03f895bf2dc8dc6df21db3042284a6f4416b06a29"
+        }
+      ]
+    }
+  ]
+}
