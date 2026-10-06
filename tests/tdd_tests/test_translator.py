@@ -1,6 +1,6 @@
 import unittest
 import copy
-from core.translator import TranslatorEngine
+from core.work_logic.translator import TranslatorEngine
 
 
 class TestTranslatorEngine(unittest.TestCase):

@@ -9,7 +9,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from core.audio_processor import extract_audio
+from core.work_logic.audio_processor import extract_audio
 
 
 class TestAudioProcessor(unittest.TestCase):

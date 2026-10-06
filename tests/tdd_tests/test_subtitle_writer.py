@@ -1,7 +1,7 @@
 import os
 import unittest
 import shutil
-from core.subtitle_writer import SubtitleWriter
+from core.work_logic.subtitle_writer import SubtitleWriter
 
 
 class TestSubtitleWriter(unittest.TestCase):

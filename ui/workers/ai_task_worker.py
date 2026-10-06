@@ -4,10 +4,10 @@ from pathlib import Path
 from PySide6.QtCore import QThread, Signal
 
 # 导入你写好的核心底层引擎
-from core.whisper_engine import WhisperEngine
-from core.translator import TranslatorEngine
-from core.subtitle_writer import SubtitleWriter
-from core.audio_processor import extract_audio
+from core.work_logic.whisper_engine import WhisperEngine
+from core.work_logic.translator import TranslatorEngine
+from core.work_logic.subtitle_writer import SubtitleWriter
+from core.work_logic.audio_processor import extract_audio
 
 
 class AITaskWorker(QThread):

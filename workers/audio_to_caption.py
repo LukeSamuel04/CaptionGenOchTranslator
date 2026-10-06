@@ -16,8 +16,8 @@ def run_audio_to_caption_process(media_path: str, cache_dir: str, ipc_queue):
     # 铁律落地：重型依赖在进程内部按需导入！
     # 这样主程序在导包时，绝对不会意外加载 PyTorch 占用显存。
     # ==========================================
-    from core.whisper_engine import WhisperEngine
-    from core.audio_processor import extract_audio
+    from core.work_logic.whisper_engine import WhisperEngine
+    from core.work_logic.audio_processor import extract_audio
 
     try:
         # ==========================================

@@ -3,7 +3,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from ui.main_window_new import MainWindowNew
-from ui.test_windows.components_testing.combox_optgrp import TestWindow
+from ui.test_windows.cards_testing.model_download_card import CardTestWindow
 
 def main():
     # 强制适配高分屏（如 4K 显示器），防止 UI 元素模糊缩放
