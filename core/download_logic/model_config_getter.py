@@ -11,13 +11,12 @@ class ModelConfigGetter:
     """
 
     def __init__(self):
-        # 1. 动态获取当前脚本所在目录 (core文件夹)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # 直接读取全局环境变量获取绝对根目录，无需再手动算层级
+        project_root = os.environ.get("APP_PROJECT_ROOT")
+        if not project_root:
+            raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
 
-        # 2. 退一级回到项目根目录
-        project_root = os.path.dirname(current_dir)
-
-        # 3. 拼接出项目根目录下的精确缓存路径
+        # 拼接出项目根目录下的精确缓存路径
         self.cache_dir = os.path.join(project_root, ".caption_cache", "model_config_cache")
         self.cache_file = os.path.join(self.cache_dir, "models_cache.json")
 

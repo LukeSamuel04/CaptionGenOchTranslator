@@ -35,7 +35,7 @@ class MainWindowNew(QMainWindow):
         # 继承原有的基础窗口设置[cite: 14]
         self.setWindowTitle(self.tr("CaptionGen Translator - 专业离线AI字幕引擎 (全新极简版)"))
         self.resize(1000, 700)
-        self.setMinimumSize(950, 700)
+        self.setMinimumSize(1000, 700)
         # 2. 调用居中！
         self.center_window()
         # 建立中央画布和主水平布局 (左右分栏)[cite: 14]

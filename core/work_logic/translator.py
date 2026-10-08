@@ -22,13 +22,16 @@ class TranslatorEngine:
 
     def __init__(self, model_path=None, context_size=2):
         """
-        初始化大语言模型翻译引擎。
-        :param model_path: GGUF 模型路径。如果留空，默认去 assets/models 寻找。
-        :param context_size: 默认的上下文窗口大小（前后各保留几句）。
-        """
+                初始化大语言模型翻译引擎。
+                :param model_path: GGUF 模型路径。如果留空，默认去 assets/models 寻找。
+                :param context_size: 默认的上下文窗口大小（前后各保留几句）。
+                """
         if model_path is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            model_path = os.path.join(base_dir, 'assets', 'models', 'llama-3.1-8b', 'llama-3.1-8b.gguf')
+            # 接入全局 GPS 信号
+            project_root = os.environ.get("APP_PROJECT_ROOT")
+            if not project_root:
+                raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
+            model_path = os.path.join(project_root, 'assets', 'models', 'llama-3.1-8b', 'llama-3.1-8b.gguf')
 
         print(f"[*] 正在唤醒本地大语言模型 (路径: {model_path})...")
 

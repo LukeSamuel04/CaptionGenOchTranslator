@@ -23,24 +23,21 @@ class MultiStatusDownloadButton(QPushButton):
         super().__init__(parent)
         self.current_state = None
 
-        # 基础样式常量
+        # [修改] 进一步缩减内边距和最小宽度，让按钮变得更窄更精致
         self.BASE_STYLE = """
             QPushButton {
-                border-radius: 6px;
-                padding: 8px 18px;
-                font-size: 13px;
+                border-radius: 5px;
+                padding: 4px 8px;
+                font-size: 12px;
                 font-weight: bold;
                 border: none;
+                min-width: 60px;
             }
         """
 
-        # 初始状态设为未安装
         self.update_status(DownloadUIState.NORMAL)
 
     def update_status(self, state: DownloadUIState):
-        """
-        核心方法：根据传入的状态枚举，动态切换按钮的文案、颜色和交互反馈
-        """
         if self.current_state == state:
             return
 
@@ -58,7 +55,6 @@ class MultiStatusDownloadButton(QPushButton):
 
         elif state == DownloadUIState.RESUME:
             self.setText("继续下载")
-            # 科技橙色，提示用户有未完成的任务
             color_style = """
                 QPushButton { background-color: #D83B01; color: #FFFFFF; }
                 QPushButton:hover { background-color: #EA460D; }
@@ -67,7 +63,6 @@ class MultiStatusDownloadButton(QPushButton):
 
         elif state == DownloadUIState.DOWNLOADING:
             self.setText("暂停")
-            # 次级操作色 (深灰)，降低下载过程中的视觉干扰
             color_style = """
                 QPushButton { background-color: #3F3F3F; color: #E0E0E0; }
                 QPushButton:hover { background-color: #4F4F4F; }
@@ -76,7 +71,7 @@ class MultiStatusDownloadButton(QPushButton):
 
         elif state == DownloadUIState.INSTALLED:
             self.setText("已安装")
-            self.setEnabled(False)  # 已安装状态下按钮不可点击
+            self.setEnabled(False)
             self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
             color_style = """
                 QPushButton:disabled { 
@@ -87,7 +82,6 @@ class MultiStatusDownloadButton(QPushButton):
 
         elif state == DownloadUIState.CORRUPTED:
             self.setText("重新下载")
-            # 警示红，提示文件异常
             color_style = """
                 QPushButton { background-color: #D13438; color: #FFFFFF; }
                 QPushButton:hover { background-color: #A80000; }
@@ -99,5 +93,4 @@ class MultiStatusDownloadButton(QPushButton):
         self.setStyleSheet(self.BASE_STYLE + color_style)
 
     def get_current_state(self) -> DownloadUIState:
-        """供外部获取当前按钮状态，以决定点击时执行什么业务逻辑"""
         return self.current_state

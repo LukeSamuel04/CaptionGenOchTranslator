@@ -17,10 +17,10 @@ class ModelDownloadChecker:
     """
 
     def __init__(self):
-        # 1. 动态定位项目根目录 (当前处于 core/download_logic 目录)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        core_dir = os.path.dirname(current_dir)
-        self.project_root = os.path.dirname(core_dir)
+        # 统一接入全局 GPS 信号，抛弃原本的两层 dirname 退级逻辑
+        self.project_root = os.environ.get("APP_PROJECT_ROOT")
+        if not self.project_root:
+            raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
 
     def check_status(self, model_info: Dict[str, Any]) -> Dict[str, Any]:
         """
