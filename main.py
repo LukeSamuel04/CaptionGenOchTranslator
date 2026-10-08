@@ -21,6 +21,7 @@ os.environ["APP_PROJECT_ROOT"] = PROJECT_ROOT
 from PySide6.QtWidgets import QApplication
 from ui.main_window_new import MainWindowNew
 from ui.test_windows.components_testing.muti_status_fetch_config_button import FetchConfigButtonTestWindow
+from ui.test_windows.components_testing.download_pb_with_cancel import PBTestingWindow
 
 def main():
     # 强制适配高分屏（如 4K 显示器），防止 UI 元素模糊缩放

@@ -20,7 +20,7 @@ class ModelConfigGetter:
         self.cache_dir = os.path.join(project_root, ".caption_cache", "model_config_cache")
         self.cache_file = os.path.join(self.cache_dir, "models_cache.json")
 
-        self.remote_url = "https://raw.githubusercontent.com/LukeSamuel04/CaptionGenOchTranslator/main/configs/downloads/models.json"
+        self.remote_url = "https://raw.githubusercontent.com/LukeSamuel04/CaptionGenOchTranslator/dev-download-page/configs/downloads/models.json"
         self.timeout = 5
 
     def fetch_remote_json(self) -> Dict[str, Any]:
