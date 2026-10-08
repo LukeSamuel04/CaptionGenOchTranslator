@@ -1,5 +1,3 @@
-import os
-import time
 from pathlib import Path
 
 
@@ -16,9 +14,9 @@ def run_translate_typeset_process(source_file_path: str, output_dir: str, target
     # 铁律落地：重型依赖与业务组件在进程内部按需导入！
     # 彻底杜绝主程序因 import 导致的显存幽灵占用和上下文冲突。
     # ==========================================
-    from core.translator import TranslatorEngine
-    from core.subtitle_writer import SubtitleWriter
-    from core.subtitle_parser import SubtitleParser
+    from core.work_logic.translator import TranslatorEngine
+    from core.work_logic.subtitle_writer import SubtitleWriter
+    from core.work_logic.subtitle_parser import SubtitleParser
 
     def export_to_disk(segments_data: list, lang_code: str, active_modes: list):
         """内部闭包辅助方法：对接 SubtitleWriter 执行按文件夹分类落盘"""

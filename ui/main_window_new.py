@@ -6,7 +6,7 @@ from PySide6.QtGui import QFont
 
 # --- 占位区域：未来等页面开发完毕后，解开这里的注释进行真实导入 ---
 from ui.pages.workspace_page import WorkspacePage
-# from ui.pages.download_page import DownloadPage
+from ui.pages.download_page import DownloadPage
 # from ui.pages.settings_page import SettingsPage
 
 class PlaceholderPage(QWidget):
@@ -35,7 +35,7 @@ class MainWindowNew(QMainWindow):
         # 继承原有的基础窗口设置[cite: 14]
         self.setWindowTitle(self.tr("CaptionGen Translator - 专业离线AI字幕引擎 (全新极简版)"))
         self.resize(1000, 700)
-        self.setMinimumSize(950, 700)
+        self.setMinimumSize(1000, 700)
         # 2. 调用居中！
         self.center_window()
         # 建立中央画布和主水平布局 (左右分栏)[cite: 14]
@@ -98,7 +98,7 @@ class MainWindowNew(QMainWindow):
 
         # TODO: 未来在这里将 PlaceholderPage 替换为真实的 WorkspacePage 等实例
         self.workspace_page = WorkspacePage()
-        self.download_page = PlaceholderPage("组件下载")
+        self.download_page = DownloadPage()
         self.settings_page = PlaceholderPage("系统设置")
 
         self.stacked_widget.addWidget(self.workspace_page)

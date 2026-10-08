@@ -1,4 +1,3 @@
-import os
 import multiprocessing
 from pathlib import Path
 from dataclasses import dataclass
@@ -6,7 +5,7 @@ from enum import Enum
 from PySide6.QtCore import QObject, Signal
 
 # 导入跨进程对讲机 (前台监听员)
-from core.ipc_listener import IPCListener
+from core.work_logic.ipc_listener import IPCListener
 
 # 导入我们刚刚重构好的纯 Python 独立函数 (非类)
 from workers.audio_to_caption import run_audio_to_caption_process

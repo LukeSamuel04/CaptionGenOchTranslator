@@ -5,14 +5,15 @@ from faster_whisper import WhisperModel
 class WhisperEngine:
     def __init__(self, model_size_or_path=None):
         """
-        初始化 Whisper 引擎，加载模型常驻内存。
-        """
-        # 1. 恢复为你原本正确的本地离线模型路径动态定位逻辑
+                初始化 Whisper 引擎，加载模型常驻内存。
+                """
         if model_size_or_path is None:
-            # 获取当前文件 (whisper_engine.py) 所在的 core 文件夹，再往上一级得到项目根目录
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            # 拼接出绝对路径：项目根目录/assets/models/whisper-large-v3
-            model_size_or_path = os.path.join(base_dir, 'assets', 'models', 'whisper-large-v3')
+            # 接入全局 GPS 信号
+            project_root = os.environ.get("APP_PROJECT_ROOT")
+            if not project_root:
+                raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
+            # 拼接出绝对路径：项目真正的根目录/assets/models/whisper-large-v3
+            model_size_or_path = os.path.join(project_root, 'assets', 'models', 'whisper-large-v3')
 
         print(f"[*] 正在初始化 Whisper 引擎 (准备加载模型: {model_size_or_path})...")
 
