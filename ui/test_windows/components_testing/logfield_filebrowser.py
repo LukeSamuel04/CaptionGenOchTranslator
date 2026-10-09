@@ -2,10 +2,10 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 from PySide6.QtCore import Qt, QTimer
 
 # 导入毛玻璃容器、日志面板组件、按钮组件和文件浏览组件
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
-from ui.components_new.log_field.blue_logfield import LogPreviewPanel
-from ui.components_new.buttons.rounded_blue_button import RoundedButton
-from ui.components_new.file_browsers.blue_file_browser import FileBrowseWidget
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.log_field.blue_logfield import LogPreviewPanel
+from ui.components.buttons.rounded_blue_button import RoundedButton
+from ui.components.file_browsers.blue_file_browser import FileBrowseWidget
 
 
 class TestWindow(QWidget):

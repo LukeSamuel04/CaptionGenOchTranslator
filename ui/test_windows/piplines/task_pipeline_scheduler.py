@@ -3,15 +3,15 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
                                QMessageBox, QComboBox, QLabel)
 
 # 导入白蓝极简风组件
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
-from ui.components_new.log_field.blue_logfield import LogPreviewPanel
-from ui.components_new.buttons.rounded_blue_button import RoundedButton
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.log_field.blue_logfield import LogPreviewPanel
+from ui.components.buttons.rounded_blue_button import RoundedButton
 
 # 导入全新的多进程调度器
 from schedulers.task_pipeline_scheduler import TaskPipelineScheduler, TaskMode, TaskConfig
 
 # 为了方便测试，我们借用一下之前的组件
-from ui.components_new.file_browsers.blue_file_browser import FileBrowseWidget
+from ui.components.file_browsers.blue_file_browser import FileBrowseWidget
 
 
 # ==========================================

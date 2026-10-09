@@ -1,7 +1,7 @@
 import sys
 import os
 
-# 动态获取项目根目录并加入系统路径，确保绝对导入(ui.components_new...)能成功
+# 动态获取项目根目录并加入系统路径，确保绝对导入(ui.components...)能成功
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # 向上回退三级：components_testing -> test_windows -> ui -> 项目根目录
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
@@ -10,7 +10,7 @@ if project_root not in sys.path:
 
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 from PySide6.QtCore import Qt
-from ui.components_new.buttons.muti_status_download_button import MultiStatusDownloadButton, DownloadUIState
+from ui.components.buttons.muti_status_download_button import MultiStatusDownloadButton, DownloadUIState
 
 
 class TestWindow(QWidget):

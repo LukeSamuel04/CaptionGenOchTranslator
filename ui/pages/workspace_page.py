@@ -5,16 +5,16 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
 from PySide6.QtCore import Qt, QUrl
 
 # 引入白蓝极简风组件
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
-from ui.components_new.file_browsers.blue_file_browser import FileBrowseWidget
-from ui.components_new.option_groups.blue_optgrp import OptionGroup
-from ui.components_new.log_field.blue_logfield import LogPreviewPanel
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.file_browsers.blue_file_browser import FileBrowseWidget
+from ui.components.option_groups.blue_optgrp import OptionGroup
+from ui.components.log_field.blue_logfield import LogPreviewPanel
 
 # 引入带标题下拉框
-from ui.components_new.comboboxes.blue_up_subtitle_cb import LabeledComboBox
+from ui.components.comboboxes.blue_up_subtitle_cb import LabeledComboBox
 
 # 引入多状态核心开关
-from ui.components_new.buttons.multi_status_start_button import MultiStatusStartButton
+from ui.components.buttons.multi_status_start_button import MultiStatusStartButton
 
 # 引入后端调度器与数据契约
 from schedulers.task_pipeline_scheduler import TaskPipelineScheduler, TaskMode, TaskConfig
@@ -32,6 +32,8 @@ class WorkspacePage(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        # [核心新增]：颁发全局身份证，确保未来主题系统可精准控制该页面
+        self.setObjectName("workspacePage")
 
         # 核心语言字典映射
         self.SUPPORTED_LANGS = {
@@ -41,9 +43,7 @@ class WorkspacePage(QWidget):
             self.tr("日语 (日本語)"): "ja",
             self.tr("韩语 (한국어)"): "ko",
             self.tr("德语 (Deutsch)"): "de",
-            self.tr("法语 (Français)"): "fr",
             self.tr("西班牙语 (Español)"): "es",
-            self.tr("俄语 (Русский)"): "ru",
             self.tr("阿拉伯语 (العربية)"): "ar",
             self.tr("乌克兰语 (Українська)"): "uk"
         }

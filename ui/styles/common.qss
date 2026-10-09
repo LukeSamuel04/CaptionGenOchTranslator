@@ -1,0 +1,95 @@
+/* ==========================================
+   全局通用结构与字体 (Common)
+   ========================================== */
+QWidget {
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+/* ==========================================
+   悬浮提示框 (QToolTip) - 物理结构
+   ========================================== */
+QToolTip {
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 12px;
+}
+
+/* ==========================================
+   通用红叉按钮 (CloseXButton) - 结构与固定危险色
+   ========================================== */
+#CloseXButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 10px;
+}
+
+/* 毁灭性操作的警示红，属于业务语意颜色，不随黑夜白天改变 */
+#CloseXButton:hover {
+    color: #D13438;
+    background-color: rgba(209, 52, 56, 30);
+}
+
+#CloseXButton:pressed {
+    color: #A80000;
+    background-color: rgba(209, 52, 56, 50);
+}
+
+/* ==========================================
+   通用毛玻璃卡片容器 (glassContainer) - 物理结构
+   ========================================== */
+QFrame#glassContainer {  /* [核心修改] 补全 QFrame，唤醒圆角渲染 */
+    border-radius: 12px;
+}
+
+/* ==========================================
+   下载页面滚动区域样式 (DownloadPage) - 物理结构
+   ========================================== */
+#downloadScrollArea,
+#downloadScrollContent {
+    border: none;
+    background: transparent;
+}
+
+/* 垂直滚动条轨道与结构 */
+#downloadScrollArea QScrollBar:vertical {
+    border: none;
+    background: transparent;
+    width: 8px;
+    margin: 0px;
+}
+#downloadScrollArea QScrollBar::handle:vertical {
+    min-height: 30px;
+    border-radius: 4px;
+}
+#downloadScrollArea QScrollBar::add-line:vertical,
+#downloadScrollArea QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+    height: 0px;
+}
+#downloadScrollArea QScrollBar::add-page:vertical,
+#downloadScrollArea QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* 水平滚动条轨道与结构 */
+#downloadScrollArea QScrollBar:horizontal {
+    border: none;
+    background: transparent;
+    height: 8px;
+    margin: 0px;
+}
+#downloadScrollArea QScrollBar::handle:horizontal {
+    min-width: 30px;
+    border-radius: 4px;
+}
+#downloadScrollArea QScrollBar::add-line:horizontal,
+#downloadScrollArea QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
+    width: 0px;
+}
+#downloadScrollArea QScrollBar::add-page:horizontal,
+#downloadScrollArea QScrollBar::sub-page:horizontal {
+    background: none;
+}

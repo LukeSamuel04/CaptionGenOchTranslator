@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtCore import QTimer
 
 # 导入我们刚刚编写的带取消按钮的进度条组件
-from ui.components_new.progress_bars.download_pb_with_cancel import DownloadProgressBarWithCancel
+from ui.components.progress_bars.download_pb_with_cancel import DownloadProgressBarWithCancel
 
 
 class PBTestingWindow(QWidget):

@@ -4,7 +4,7 @@ from PySide6.QtCore import QTimer
 
 # 引入被测试的下载卡片组件与状态枚举
 from ui.cards.model_card_status_download import ModelCardStatusDownload
-from ui.components_new.buttons.muti_status_download_button import DownloadUIState
+from ui.components.buttons.muti_status_download_button import DownloadUIState
 
 
 class CardTestingWindow(QWidget):

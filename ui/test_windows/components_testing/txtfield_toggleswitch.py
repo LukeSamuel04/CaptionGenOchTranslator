@@ -2,10 +2,10 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt
 
 # 导入毛玻璃容器、文本输入框和按钮组件
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
-from ui.components_new.text_fields.blue_textfield import LabeledTextField
-from ui.components_new.buttons.rounded_blue_button import RoundedButton
-from ui.components_new.toggle_switches.ios_styled_ts import ToggleSwitch
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.text_fields.blue_textfield import LabeledTextField
+from ui.components.buttons.rounded_blue_button import RoundedButton
+from ui.components.toggle_switches.ios_styled_ts import ToggleSwitch
 
 class TestWindow(QWidget):
     def __init__(self):

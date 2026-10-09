@@ -1,45 +1,45 @@
 /* ==========================================
-   全局底色与文本色 (Dark Theme)
+   全局底色与文本色 (Light Theme)
    ========================================== */
 QWidget {
-    color: #E0E0E0; /* 取消全局背景色，仅保留全局文字颜色 */
+    color: #333333; /* 取消全局背景色，仅保留全局文字颜色 */
 }
 
-/* [核心修改] 精准给页面底板上色 */
+/* [核心修改] 精准给页面底板上色，防止污染内部子组件使其变实心 */
 #DownloadPage, #workspacePage {
-    background-color: #1E1E1E;
+    background-color: #F8F9FA;
 }
 
 /* ==========================================
-   悬浮提示框 (QToolTip) - 深色配色
+   悬浮提示框 (QToolTip) - 浅色配色
    ========================================== */
 QToolTip {
-    background-color: #2D2D30;
-    color: #E0E0E0;
-    border: 1px solid #555555;
+    background-color: #FFFFFF;
+    color: #333333;
+    border: 1px solid #CCCCCC;
 }
 
 /* ==========================================
    通用红叉按钮 (CloseXButton) - 常态配色
    ========================================== */
 #CloseXButton {
-    color: #A0A0A0;
+    color: #888888;
 }
 
 /* ==========================================
-   通用毛玻璃卡片容器 (glassContainer) - 深色玻璃材质
+   通用毛玻璃卡片容器 (glassContainer) - 浅色玻璃材质
    ========================================== */
-QFrame#glassContainer { /* [核心修改] 补全 QFrame */
-    background-color: rgba(45, 45, 45, 150);
-    border: 1px solid rgba(0, 120, 215, 60);
+QFrame#glassContainer { /* [核心修改] 补全 QFrame，唤醒边框渲染 */
+    background-color: rgba(255, 255, 255, 150);
+    border: 1px solid rgba(0, 120, 215, 40);
 }
 
 /* ==========================================
-   下载页面滚动条 (DownloadPage) - 深色环境滑块
+   下载页面滚动条 (DownloadPage) - 浅色环境滑块
    ========================================== */
 #downloadScrollArea QScrollBar::handle:vertical,
 #downloadScrollArea QScrollBar::handle:horizontal {
-    background-color: rgba(255, 255, 255, 30);
+    background-color: rgba(0, 0, 0, 30);
 }
 
 #downloadScrollArea QScrollBar::handle:vertical:hover,

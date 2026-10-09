@@ -1,7 +1,7 @@
 import os
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QFileDialog
 from PySide6.QtCore import Qt, Signal
-from ui.components_new.buttons.rounded_blue_button import RoundedButton
+from ui.components.buttons.rounded_blue_button import RoundedButton
 
 
 class FileBrowseWidget(QWidget):
