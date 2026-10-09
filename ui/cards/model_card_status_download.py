@@ -2,9 +2,9 @@ import os
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy
 from PySide6.QtCore import Qt, Signal
 
-from ui.components_new.buttons.muti_status_download_button import MultiStatusDownloadButton, DownloadUIState
-from ui.components_new.progress_bars.download_pb_with_cancel import DownloadProgressBarWithCancel
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.buttons.muti_status_download_button import MultiStatusDownloadButton, DownloadUIState
+from ui.components.progress_bars.download_pb_with_cancel import DownloadProgressBarWithCancel
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
 
 
 class ModelCardStatusDownload(QWidget):

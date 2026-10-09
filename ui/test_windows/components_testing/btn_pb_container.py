@@ -3,9 +3,9 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QSlider, QLabel
 from PySide6.QtCore import Qt
 
 # 导入组件
-from ui.components_new.buttons.rounded_blue_button import RoundedButton
-from ui.components_new.progress_bars.colourful_progress_horved_pb import UniversalProgressBar
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.buttons.rounded_blue_button import RoundedButton
+from ui.components.progress_bars.colourful_progress_horved_pb import UniversalProgressBar
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
 
 
 class TestWindow(QWidget):

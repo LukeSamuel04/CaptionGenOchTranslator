@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, Q
 from PySide6.QtCore import QTimer, Qt
 
 # 引入你刚刚写好的目标组件
-from ui.components_new.buttons.muti_status_fetch_config_button import MultiStatusFetchConfigButton
+from ui.components.buttons.muti_status_fetch_config_button import MultiStatusFetchConfigButton
 
 
 class FetchConfigButtonTestWindow(QWidget):

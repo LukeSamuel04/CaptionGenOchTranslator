@@ -1,10 +1,8 @@
 from PySide6.QtWidgets import QHBoxLayout
 from PySide6.QtCore import Qt, Signal
 
-# 导入你原有的通用进度条作为父类 (注意导入路径请根据你的实际情况微调)
-from .colourful_progress_horved_pb import UniversalProgressBar
-# 导入我们刚刚重构的独立红叉按钮组件 (注意导入路径请根据你的实际情况微调)
-from ui.components_new.buttons.close_or_cancel_X_button import CloseOrCancelXButton
+from ui.components.progress_bars.colourful_progress_horved_pb import UniversalProgressBar
+from ui.components.buttons.close_or_cancel_X_button import CloseOrCancelXButton
 
 
 class DownloadProgressBarWithCancel(UniversalProgressBar):

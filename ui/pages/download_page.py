@@ -15,9 +15,9 @@ from workers.download_model import ModelDownloadWorker
 from ui.cards.model_card_status_download import ModelCardStatusDownload
 from ui.cards.model_card_status_installed import ModelCardStatusInstalled
 
-from ui.components_new.buttons.muti_status_download_button import DownloadUIState
-from ui.components_new.toggle_switches.ios_styled_ts import ToggleSwitch
-from ui.components_new.buttons.muti_status_fetch_config_button import MultiStatusFetchConfigButton
+from ui.components.buttons.muti_status_download_button import DownloadUIState
+from ui.components.toggle_switches.ios_styled_ts import ToggleSwitch
+from ui.components.buttons.muti_status_fetch_config_button import MultiStatusFetchConfigButton
 
 
 class DownloadPage(QWidget):
@@ -74,25 +74,14 @@ class DownloadPage(QWidget):
         # 2. 核心滚动列表区 (Scroll Area)
         # ==========================================
         self.scroll_area = QScrollArea()
+        # [核心改动] 发放身份证号，移除 setStyleSheet
+        self.scroll_area.setObjectName("downloadScrollArea")
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
-        self.scroll_area.setStyleSheet("""
-            QScrollArea { border: none; background: transparent; }
-            QScrollBar:vertical { border: none; background: transparent; width: 8px; margin: 0px; }
-            QScrollBar::handle:vertical { background-color: rgba(0, 0, 0, 30); min-height: 30px; border-radius: 4px; }
-            QScrollBar::handle:vertical:hover { background-color: rgba(0, 120, 215, 150); }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { border: none; background: none; height: 0px; }
-            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
-            QScrollBar:horizontal { border: none; background: transparent; height: 8px; margin: 0px; }
-            QScrollBar::handle:horizontal { background-color: rgba(0, 0, 0, 30); min-width: 30px; border-radius: 4px; }
-            QScrollBar::handle:horizontal:hover { background-color: rgba(0, 120, 215, 150); }
-            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal { border: none; background: none; width: 0px; }
-            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
-        """)
-
         self.content_widget = QWidget()
-        self.content_widget.setStyleSheet("background: transparent;")
+        # [核心改动] 发放身份证号，移除 background: transparent
+        self.content_widget.setObjectName("downloadScrollContent")
         self.content_layout = QVBoxLayout(self.content_widget)
         self.content_layout.setContentsMargins(0, 0, 10, 0)
 
@@ -164,12 +153,10 @@ class DownloadPage(QWidget):
             model_id = model_info.get("model_id", "")
             category = model_info.get("category", "translation")
 
-            # 记录数据缓存与目标布局，为以后变魔术（切卡）做准备
             self.models_info_cache[model_id] = model_info
             target_layout = self.right_col_layout if category == "translation" else self.left_col_layout
             self.card_layouts[model_id] = target_layout
 
-            # 获取状态并造卡
             status_report = self.status_checker.check_status(model_info)
             card = self._create_card_by_status(model_info, status_report)
 
@@ -177,16 +164,13 @@ class DownloadPage(QWidget):
             self.card_widgets[model_id] = card
 
     def _create_card_by_status(self, model_info: dict, status_report: dict) -> QWidget:
-        """核心路由：根据模型在硬盘中的状态，决定发什么牌（生成哪种卡片）"""
         ui_state = self._map_status_to_ui_state(status_report["status"])
 
         if ui_state == DownloadUIState.INSTALLED:
-            # 已经下好了，发 Installed 卡
             card = ModelCardStatusInstalled(model_info)
             card.delete_requested.connect(self._on_delete_requested)
             return card
         else:
-            # 没下好，发 Download 卡
             card = ModelCardStatusDownload(model_info)
             card.update_card_state(
                 state=ui_state,
@@ -198,7 +182,6 @@ class DownloadPage(QWidget):
             return card
 
     def _swap_card(self, model_id: str, new_status: DownloadStatus):
-        """大魔术师：在页面上将旧卡片销毁，原地替换为新状态的卡片"""
         old_card = self.card_widgets.get(model_id)
         if not old_card:
             return
@@ -206,19 +189,15 @@ class DownloadPage(QWidget):
         model_info = self.models_info_cache[model_id]
         layout = self.card_layouts[model_id]
 
-        # 伪造一个 status_report 喂给发牌官
         mock_report = {"status": new_status.value, "downloaded_bytes": 0, "total_bytes": 1}
         new_card = self._create_card_by_status(model_info, mock_report)
 
-        # 找到旧卡片在布局中的精确位置，并在那里插入新卡片
         idx = layout.indexOf(old_card)
         layout.insertWidget(idx, new_card)
 
-        # 销毁旧卡片
         old_card.setParent(None)
         old_card.deleteLater()
 
-        # 登记新卡片
         self.card_widgets[model_id] = new_card
 
     def _clear_cards(self):
@@ -262,7 +241,6 @@ class DownloadPage(QWidget):
     # 交互调度中心 (Dispatcher & Terminator)
     # ==========================================
     def _dispatch_card_action(self, model_id: str, current_state: DownloadUIState):
-        """处理下载、暂停的核心分发"""
         use_mirror = self.mirror_switch.get_value()
         card = self.card_widgets.get(model_id)
         if not card or not isinstance(card, ModelCardStatusDownload):
@@ -293,7 +271,6 @@ class DownloadPage(QWidget):
                 worker.pause()
 
     def _on_cancel_requested(self, model_id: str):
-        """【防抖与终结】处理进度条红叉取消请求"""
         reply = QMessageBox.question(
             self,
             "终止下载",
@@ -303,22 +280,18 @@ class DownloadPage(QWidget):
         )
 
         if reply == QMessageBox.StandardButton.Yes:
-            # 1. 杀线程
             worker = self.download_workers.get(model_id)
             if worker:
                 worker.pause()
                 self._cleanup_download_worker(model_id)
 
-            # 2. 删碎片
             self._delete_model_files(model_id, only_partials=True)
 
-            # 3. 恢复纯净 UI
             card = self.card_widgets.get(model_id)
             if isinstance(card, ModelCardStatusDownload):
                 card.update_card_state(DownloadUIState.NORMAL)
 
     def _on_delete_requested(self, model_id: str):
-        """【防抖与终结】处理右上角红叉卸载请求"""
         reply = QMessageBox.question(
             self,
             "删除模型",
@@ -328,14 +301,10 @@ class DownloadPage(QWidget):
         )
 
         if reply == QMessageBox.StandardButton.Yes:
-            # 1. 连根拔起删文件夹
             self._delete_model_files(model_id, only_partials=False)
-
-            # 2. 魔术变身：将 Installed 卡降维回 Download 卡
             self._swap_card(model_id, DownloadStatus.NOT_INSTALLED)
 
     def _delete_model_files(self, model_id: str, only_partials: bool = False):
-        """物理删除引擎：负责清理碎片(.part)或彻底删除整个模型文件夹"""
         model_info = self.models_info_cache.get(model_id)
         if not model_info:
             return
@@ -348,7 +317,6 @@ class DownloadPage(QWidget):
         install_dir_abs = os.path.join(project_root, install_dir_rel.replace("/", os.sep))
 
         if only_partials:
-            # 仅抹除带 .part 后缀的未完成文件
             for f_node in model_info.get("files", []):
                 part_file = os.path.join(install_dir_abs, f_node["file_name"] + ".part")
                 if os.path.exists(part_file):
@@ -357,7 +325,6 @@ class DownloadPage(QWidget):
                     except:
                         pass
         else:
-            # 彻底铲除整个目录树
             if os.path.exists(install_dir_abs):
                 try:
                     shutil.rmtree(install_dir_abs)
@@ -374,7 +341,6 @@ class DownloadPage(QWidget):
 
     def _on_download_finished(self, model_id: str):
         self._cleanup_download_worker(model_id)
-        # [核心魔术] 满进度瞬间，销毁 Download 卡，原地变出 Installed 卡
         self._swap_card(model_id, DownloadStatus.INSTALLED)
 
     def _on_download_paused(self, model_id: str):

@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QWidget, QVBoxLayout, QGroupBox, QHBoxLayout,
 from PySide6.QtCore import QTimer
 
 # 导入我们刚刚编写的多状态按钮
-from ui.components_new.buttons.multi_status_start_button import MultiStatusStartButton
+from ui.components.buttons.multi_status_start_button import MultiStatusStartButton
 
 
 class MultiStatusButtonTestWindow(QWidget):

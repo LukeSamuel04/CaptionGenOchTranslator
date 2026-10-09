@@ -1,10 +1,10 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import Qt
-from ui.components_new.option_groups.blue_optgrp import OptionGroup
+from ui.components.option_groups.blue_optgrp import OptionGroup
 
 # 导入毛玻璃容器和刚写好的下拉框组件
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
-from ui.components_new.comboboxes.blue_up_subtitle_cb import LabeledComboBox
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.comboboxes.blue_up_subtitle_cb import LabeledComboBox
 
 
 class TestWindow(QWidget):

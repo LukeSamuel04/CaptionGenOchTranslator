@@ -3,8 +3,8 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePo
 from PySide6.QtCore import Qt, Signal
 
 # 引入我们刚才重构好的通用红叉按钮
-from ui.components_new.buttons.close_or_cancel_X_button import CloseOrCancelXButton
-from ui.components_new.containers.white_translucent_container import WhiteTranslucentContainer
+from ui.components.buttons.close_or_cancel_X_button import CloseOrCancelXButton
+from ui.components.containers.white_translucent_container import WhiteTranslucentContainer
 
 
 class ModelCardStatusInstalled(QWidget):
