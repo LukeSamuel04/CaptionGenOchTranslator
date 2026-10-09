@@ -11,7 +11,7 @@ from core.download_logic.model_download_checker import ModelDownloadChecker, Dow
 from workers.fetch_config import FetchConfigWorker
 from workers.download_model import ModelDownloadWorker
 
-# [核心修改] 引入全新的“两卡流”分离组件，取代原本臃肿的 ModelDownloadCard
+# 引入全新的“两卡流”分离组件，取代原本臃肿的 ModelDownloadCard
 from ui.cards.model_card_status_download import ModelCardStatusDownload
 from ui.cards.model_card_status_installed import ModelCardStatusInstalled
 
@@ -74,13 +74,11 @@ class DownloadPage(QWidget):
         # 2. 核心滚动列表区 (Scroll Area)
         # ==========================================
         self.scroll_area = QScrollArea()
-        # [核心改动] 发放身份证号，移除 setStyleSheet
         self.scroll_area.setObjectName("downloadScrollArea")
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         self.content_widget = QWidget()
-        # [核心改动] 发放身份证号，移除 background: transparent
         self.content_widget.setObjectName("downloadScrollContent")
         self.content_layout = QVBoxLayout(self.content_widget)
         self.content_layout.setContentsMargins(0, 0, 10, 0)
@@ -309,7 +307,6 @@ class DownloadPage(QWidget):
         if not model_info:
             return
 
-        # 【核心修改】：替换旧环境变量，确保精准清理实际物理磁盘上的模型文件
         data_root = os.environ.get("APP_DATA_DIR", "")
         install_dir_rel = model_info.get("install_dir", "")
         if not data_root or not install_dir_rel:
@@ -342,7 +339,25 @@ class DownloadPage(QWidget):
 
     def _on_download_finished(self, model_id: str):
         self._cleanup_download_worker(model_id)
-        self._swap_card(model_id, DownloadStatus.INSTALLED)
+
+        model_info = self.models_info_cache.get(model_id)
+        if not model_info:
+            return
+
+        # 调取状态检查器，实地校验文件是否全部下满
+        status_report = self.status_checker.check_status(model_info)
+        real_status_str = status_report["status"]
+        real_status = DownloadStatus(real_status_str)
+
+        if real_status == DownloadStatus.INSTALLED:
+            self._swap_card(model_id, DownloadStatus.INSTALLED)
+        else:
+            QMessageBox.warning(
+                self,
+                "安装异常",
+                f"模型 [{model_id}] 下载流程已结束，但文件校验未通过（可能配置缺失或文件损坏）。\n请检查网络并尝试重新下载。"
+            )
+            self._swap_card(model_id, real_status)
 
     def _on_download_paused(self, model_id: str):
         card = self.card_widgets.get(model_id)
@@ -350,11 +365,20 @@ class DownloadPage(QWidget):
             card.update_card_state(DownloadUIState.RESUME)
         self._cleanup_download_worker(model_id)
 
-    def _on_download_error(self, model_id: str, error_msg: str):
+    # 【核心修改】引入 is_fatal 参数执行错误路由分流逻辑
+    def _on_download_error(self, model_id: str, error_msg: str, is_fatal: bool = False):
+        QMessageBox.warning(self, "下载异常", f"模型 {model_id} 下载出现异常。\n详细信息: {error_msg}")
+
         card = self.card_widgets.get(model_id)
         if isinstance(card, ModelCardStatusDownload):
-            card.update_card_state(DownloadUIState.RESUME)
-        QMessageBox.warning(self, "下载失败", f"模型 {model_id} 下载异常，请重试。\n详细信息: {error_msg}")
+            if is_fatal:
+                # 如果是致命配置错误，强制清理空文件夹，并将卡片重置为原始未下载状态
+                self._delete_model_files(model_id, only_partials=False)
+                card.update_card_state(DownloadUIState.NORMAL)
+            else:
+                # 如果是网络波动，只挂起任务，保留已下载文件碎片
+                card.update_card_state(DownloadUIState.RESUME)
+
         self._cleanup_download_worker(model_id)
 
     def _cleanup_download_worker(self, model_id: str):

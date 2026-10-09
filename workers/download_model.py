@@ -22,8 +22,8 @@ class ModelDownloadWorker(QThread):
     # 暂停成功信号: (模型ID)
     download_paused = Signal(str)
 
-    # 错误信号: (模型ID, 错误详情)
-    error_occurred = Signal(str, str)
+    # 【核心修改】错误信号增加第三个布尔参数: (模型ID, 错误详情, 是否致命错误)
+    error_occurred = Signal(str, str, bool)
 
     def __init__(self, model_info: Dict[str, Any], use_mirror: bool = False, parent=None):
         super().__init__(parent)
@@ -34,7 +34,7 @@ class ModelDownloadWorker(QThread):
         # 线程控制标志位
         self._is_paused = False
 
-        # 【核心修改】：统一获取持久化数据目录，确保大模型下载后不被临时目录清理
+        # 统一获取持久化数据目录，确保大模型下载后不被临时目录清理
         self.data_root = os.environ.get("APP_DATA_DIR")
         if not self.data_root:
             raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR")
@@ -65,14 +65,21 @@ class ModelDownloadWorker(QThread):
 
                 file_name = file_node["file_name"]
                 expected_size = file_node.get("size_bytes", 0)
-                download_url = file_node.get("url", "")
 
+                # 根据是否开启镜像开关动态选择 url_cn 或 url_global，兼容旧版 url 字段
+                if self.use_mirror:
+                    download_url = file_node.get("url_cn", "") or file_node.get("url", "")
+                else:
+                    download_url = file_node.get("url_global", "") or file_node.get("url", "")
+
+                # 【核心修改】源头拦截致命错误：如果没找到 URL，立刻报警并强行终止线程
                 if not download_url:
-                    continue
-
-                # 镜像替换逻辑 (拦截 huggingface.co 替换为 hf-mirror.com)
-                if self.use_mirror and "huggingface.co" in download_url:
-                    download_url = download_url.replace("huggingface.co", "hf-mirror.com")
+                    self.error_occurred.emit(
+                        self.model_id,
+                        f"配置异常：无法找到文件 '{file_name}' 的有效下载链接",
+                        True  # is_fatal = True
+                    )
+                    return
 
                 target_file_path = os.path.join(install_dir_abs, file_name)
                 part_file_path = target_file_path + ".part"
@@ -125,9 +132,9 @@ class ModelDownloadWorker(QThread):
                 self.download_finished.emit(self.model_id)
 
         except requests.exceptions.RequestException as e:
-            self.error_occurred.emit(self.model_id, f"网络请求异常: {str(e)}")
+            self.error_occurred.emit(self.model_id, f"网络请求异常: {str(e)}", False)  # is_fatal = False
         except Exception as e:
-            self.error_occurred.emit(self.model_id, f"下载发生错误: {str(e)}")
+            self.error_occurred.emit(self.model_id, f"下载发生错误: {str(e)}", False)  # is_fatal = False
 
     def _download_single_file(self, url: str, headers: dict, part_path: str, write_mode: str,
                               base_downloaded_bytes: int, total_expected_bytes: int):
