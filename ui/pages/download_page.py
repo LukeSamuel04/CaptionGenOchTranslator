@@ -309,12 +309,13 @@ class DownloadPage(QWidget):
         if not model_info:
             return
 
-        project_root = os.environ.get("APP_PROJECT_ROOT", "")
+        # 【核心修改】：替换旧环境变量，确保精准清理实际物理磁盘上的模型文件
+        data_root = os.environ.get("APP_DATA_DIR", "")
         install_dir_rel = model_info.get("install_dir", "")
-        if not project_root or not install_dir_rel:
+        if not data_root or not install_dir_rel:
             return
 
-        install_dir_abs = os.path.join(project_root, install_dir_rel.replace("/", os.sep))
+        install_dir_abs = os.path.join(data_root, install_dir_rel.replace("/", os.sep))
 
         if only_partials:
             for f_node in model_info.get("files", []):

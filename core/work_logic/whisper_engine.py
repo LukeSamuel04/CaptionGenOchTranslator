@@ -8,12 +8,12 @@ class WhisperEngine:
                 初始化 Whisper 引擎，加载模型常驻内存。
                 """
         if model_size_or_path is None:
-            # 接入全局 GPS 信号
-            project_root = os.environ.get("APP_PROJECT_ROOT")
-            if not project_root:
-                raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
-            # 拼接出绝对路径：项目真正的根目录/assets/models/whisper-large-v3
-            model_size_or_path = os.path.join(project_root, 'assets', 'models', 'whisper-large-v3')
+            # 【核心修改】：接入持久化数据目录，读取实际存放在硬盘上的大模型文件
+            data_root = os.environ.get("APP_DATA_DIR")
+            if not data_root:
+                raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR，请确保程序由 main.py 启动。")
+            # 拼接出绝对路径：项目真正的物理根目录/assets/models/whisper-large-v3
+            model_size_or_path = os.path.join(data_root, 'assets', 'models', 'whisper-large-v3')
 
         print(f"[*] 正在初始化 Whisper 引擎 (准备加载模型: {model_size_or_path})...")
 

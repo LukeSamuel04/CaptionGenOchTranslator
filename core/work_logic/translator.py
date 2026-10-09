@@ -27,11 +27,11 @@ class TranslatorEngine:
                 :param context_size: 默认的上下文窗口大小（前后各保留几句）。
                 """
         if model_path is None:
-            # 接入全局 GPS 信号
-            project_root = os.environ.get("APP_PROJECT_ROOT")
-            if not project_root:
-                raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
-            model_path = os.path.join(project_root, 'assets', 'models', 'llama-3.1-8b', 'llama-3.1-8b.gguf')
+            # 【核心修改】：接入持久化数据目录，读取实际存放在硬盘上的大模型文件
+            data_root = os.environ.get("APP_DATA_DIR")
+            if not data_root:
+                raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR，请确保程序由 main.py 启动。")
+            model_path = os.path.join(data_root, 'assets', 'models', 'llama-3.1-8b', 'llama-3.1-8b.gguf')
 
         print(f"[*] 正在唤醒本地大语言模型 (路径: {model_path})...")
 

@@ -34,10 +34,10 @@ class ModelDownloadWorker(QThread):
         # 线程控制标志位
         self._is_paused = False
 
-        # 获取全局根目录，与 Checker 保持绝对一致
-        self.project_root = os.environ.get("APP_PROJECT_ROOT")
-        if not self.project_root:
-            raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT")
+        # 【核心修改】：统一获取持久化数据目录，确保大模型下载后不被临时目录清理
+        self.data_root = os.environ.get("APP_DATA_DIR")
+        if not self.data_root:
+            raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR")
 
     def pause(self):
         """外部调用：请求暂停下载"""
@@ -48,7 +48,8 @@ class ModelDownloadWorker(QThread):
         try:
             # 1. 准备目录
             install_dir_rel = self.model_info.get("install_dir", "")
-            install_dir_abs = os.path.join(self.project_root, install_dir_rel.replace("/", os.sep))
+            # 基于 data_root 拼接出绝对路径
+            install_dir_abs = os.path.join(self.data_root, install_dir_rel.replace("/", os.sep))
             os.makedirs(install_dir_abs, exist_ok=True)
 
             files_info = self.model_info.get("files", [])
