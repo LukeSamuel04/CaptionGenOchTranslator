@@ -13,22 +13,22 @@ class DownloadStatus(Enum):
 
 class ModelDownloadChecker:
     """
-    状态判定器：不涉及网络和界面，只专注于比对本地磁盘文件与 JSON 配置的契合度。
+    状态判定器：不涉及网络和界面，只专注于比准本地磁盘文件与 JSON 配置的契合度。
     """
 
     def __init__(self):
-        # 统一接入全局 GPS 信号，抛弃原本的两层 dirname 退级逻辑
-        self.project_root = os.environ.get("APP_PROJECT_ROOT")
-        if not self.project_root:
-            raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
+        # 【核心修改】：统一接入持久化数据目录，抛弃原本的 APP_PROJECT_ROOT
+        self.data_root = os.environ.get("APP_DATA_DIR")
+        if not self.data_root:
+            raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR，请确保程序由 main.py 启动。")
 
     def check_status(self, model_info: Dict[str, Any]) -> Dict[str, Any]:
         """
         传入单个模型的 JSON 配置字典，返回本地该模型的下载状态。
         """
         install_dir_rel = model_info.get("install_dir", "")
-        # 替换斜杠以兼容不同操作系统，拼接出绝对路径
-        install_dir_abs = os.path.join(self.project_root, install_dir_rel.replace("/", os.sep))
+        # 替换斜杠以兼容不同操作系统，基于 data_root 拼接出绝对路径
+        install_dir_abs = os.path.join(self.data_root, install_dir_rel.replace("/", os.sep))
         files_info = model_info.get("files", [])
 
         total_expected_bytes = 0

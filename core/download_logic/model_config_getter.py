@@ -11,13 +11,13 @@ class ModelConfigGetter:
     """
 
     def __init__(self):
-        # 直接读取全局环境变量获取绝对根目录，无需再手动算层级
-        project_root = os.environ.get("APP_PROJECT_ROOT")
-        if not project_root:
-            raise RuntimeError("未检测到全局根目录变量 APP_PROJECT_ROOT，请确保程序由 main.py 启动。")
+        # 【核心修改】：改为读取专门用于写入持久化数据的 APP_DATA_DIR
+        data_root = os.environ.get("APP_DATA_DIR")
+        if not data_root:
+            raise RuntimeError("未检测到全局数据目录变量 APP_DATA_DIR，请确保程序由 main.py 启动。")
 
-        # 拼接出项目根目录下的精确缓存路径
-        self.cache_dir = os.path.join(project_root, ".caption_cache", "model_config_cache")
+        # 拼接出项目数据目录下的精确缓存路径 (打包后将落在 exe 同级物理目录)
+        self.cache_dir = os.path.join(data_root, ".caption_cache", "model_config_cache")
         self.cache_file = os.path.join(self.cache_dir, "models_cache.json")
 
         self.remote_url = "https://raw.githubusercontent.com/LukeSamuel04/CaptionGenOchTranslator/dev-download-page/configs/downloads/models.json"

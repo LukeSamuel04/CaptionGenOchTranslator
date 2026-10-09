@@ -86,7 +86,10 @@ class WorkspacePage(QWidget):
         )
         self.config_container.add_widget(self.input_browser)
 
-        default_out_dir = os.path.abspath(os.path.join(os.getcwd(), "output_captions"))
+        # 【核心修改】：获取安全的全局数据目录，防止快捷方式启动导致输出路径漂移
+        data_root = os.environ.get("APP_DATA_DIR", os.getcwd())
+        default_out_dir = os.path.abspath(os.path.join(data_root, "output_captions"))
+
         self.output_browser = FileBrowseWidget(
             label_text=self.tr("最终输出目录 (Output Directory)"),
             mode="directory",
@@ -226,7 +229,9 @@ class WorkspacePage(QWidget):
             mode_mapping = {0: "original", 1: "translated", 2: "bilingual"}
             selected_modes = [mode_mapping[i] for i in self.mode_group.get_selected_indices()]
 
-        cache_dir = os.path.abspath(os.path.join(os.getcwd(), ".caption_cache"))
+        # 【核心修改】：同样使用安全的全局数据目录锁定内部缓存路径
+        data_root = os.environ.get("APP_DATA_DIR", os.getcwd())
+        cache_dir = os.path.abspath(os.path.join(data_root, ".caption_cache"))
         os.makedirs(cache_dir, exist_ok=True)
 
         return TaskConfig(
