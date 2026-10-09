@@ -27,7 +27,7 @@ def main():
     if project_root:
         styles_dir = Path(project_root) / "ui" / "styles"
         common_qss_path = styles_dir / "common.qss"
-        theme_qss_path = styles_dir / "dark_theme.qss"
+        theme_qss_path = styles_dir / "light_theme.qss"
 
         if common_qss_path.exists() and theme_qss_path.exists():
             with open(common_qss_path, "r", encoding="utf-8") as fc, \
