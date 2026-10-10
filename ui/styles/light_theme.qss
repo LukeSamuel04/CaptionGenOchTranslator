@@ -46,3 +46,17 @@ QFrame#glassContainer { /* [核心修改] 补全 QFrame，唤醒边框渲染 */
 #downloadScrollArea QScrollBar::handle:horizontal:hover {
     background-color: rgba(0, 120, 215, 150);
 }
+/* ==========================================
+   SettingCard (通用设置卡片) 浅色调色板
+   ========================================== */
+
+/* 深灰色标题 */
+#settingCardTitle {
+    color: #333333;
+}
+
+/* 极淡的蓝灰分割线 */
+#settingCardSeparator {
+    color: rgba(0, 120, 215, 30);
+    background-color: rgba(0, 120, 215, 30);
+}

@@ -3,11 +3,11 @@ from PySide6.QtWidgets import (QMainWindow, QWidget, QHBoxLayout, QVBoxLayout,
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 
-
+from ui.pages import setting_page
 # --- 占位区域：未来等页面开发完毕后，解开这里的注释进行真实导入 ---
 from ui.pages.workspace_page import WorkspacePage
 from ui.pages.download_page import DownloadPage
-# from ui.pages.settings_page import SettingsPage
+from ui.pages.setting_page import SettingPage
 
 class PlaceholderPage(QWidget):
     """通用的临时占位页面，用于在灰度更新期间替代尚未组装好的 UI"""
@@ -99,7 +99,7 @@ class MainWindowNew(QMainWindow):
         # TODO: 未来在这里将 PlaceholderPage 替换为真实的 WorkspacePage 等实例
         self.workspace_page = WorkspacePage()
         self.download_page = DownloadPage()
-        self.settings_page = PlaceholderPage("系统设置")
+        self.settings_page = SettingPage()
 
         self.stacked_widget.addWidget(self.workspace_page)
         self.stacked_widget.addWidget(self.download_page)

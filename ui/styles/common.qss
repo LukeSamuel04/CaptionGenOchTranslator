@@ -93,3 +93,19 @@ QFrame#glassContainer {  /* [核心修改] 补全 QFrame，唤醒圆角渲染 */
 #downloadScrollArea QScrollBar::sub-page:horizontal {
     background: none;
 }
+/* ==========================================
+   SettingCard (通用设置卡片) 骨架样式
+   ========================================== */
+
+/* 卡片标题 */
+#settingCardTitle {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+/* 标题下方的分割线 */
+#settingCardSeparator {
+    max-height: 1px;
+    margin-bottom: 8px; /* 为下方的具体设置项留出舒适的呼吸空间 */
+}
